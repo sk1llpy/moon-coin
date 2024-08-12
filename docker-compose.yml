@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  web-site:
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app/
+    command: npm run dev
+
+  web:
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+    command: python3 manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app/
+    ports:
+      - "8000:8000"
+    env_file:
+      - backend/.env
+    depends_on:
+      - db
+
+  fast-api:
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+    command: uvicorn API.main:app --reload --port 9999 --host 0.0.0.0
+    volumes:
+      - ./backend:/app/
+    ports:
+      - "9999:9999"
+    env_file:
+      - backend/.env
+    depends_on:
+      - db
+
+  bot:
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+    command: python3 -m bot polling
+    volumes:
+      - ./backend:/app/
+    env_file:
+      - backend/.env
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
