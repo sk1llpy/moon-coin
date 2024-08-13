@@ -7,26 +7,25 @@ const Home = () => {
     
     const [widthWindow, setWidthWindow] = useState(window.innerWidth);
     const [balance, setBalance] = useState(initialBalance);
-    const [maxEnergy, setMaxEnergy] = useState(5000);
+    const [maxEnergy, setMaxEnergy] = useState(15);
     const [energy, setEnergy] = useState(maxEnergy);
 
     const clickButton = () => {
-        setBalance(prevBalance => {
-            const newBalance = prevBalance + 1;
-            localStorage.setItem("balance", newBalance);
-            return newBalance;
-        });
-
-        setEnergy(prevEnergy => {
-            const newEnergy = prevEnergy - 1;
-            return newEnergy;
-        });
-
-        if (1 >= energy) {
-            const buttonDiv = document.getElementById("button-div");
-            buttonDiv.className = "hidden";
-        };
-
+        if (energy >= 1) {
+            setBalance(prevBalance => {
+                const newBalance = prevBalance + 1;
+                localStorage.setItem("balance", newBalance);
+                return newBalance;
+            });
+    
+            setEnergy(prevEnergy => {
+                const newEnergy = prevEnergy - 1;
+                const energyProccentDiv = document.getElementById("energy-div");
+                energyProccentDiv.style.width = `${(newEnergy * 100) / maxEnergy}%`;
+                return newEnergy;
+                
+            });
+        }
     };
 
     useEffect(() => {
@@ -40,7 +39,7 @@ const Home = () => {
         <div className="container mx-auto p-4">
             {widthWindow <= 576 && (
                 <div className="container">
-                    <div className="flex justify-between bg-gray-800 p-[15px] rounded-[10px] pl-[20px] pr-[20px] mt-2">
+                    <div className="flex justify-between bg-gray-800 p-[15px] rounded-[10px] pl-[20px] pr-[20px] mt-4">
                         <div className="flex">
                             <p className="text-white">Clan Name</p>
                         </div>
@@ -63,11 +62,17 @@ const Home = () => {
                     <div>
 
                     </div>
-                    <div className={ energyDivClass } id="energy-div">
+                    <div className="mt-5" id="energy-div">
                         <div className="flex">
                             <p className="text-gray-300 text-[15px]">
                                 <span className="text-white">{ energy }</span> / { maxEnergy }
                             </p>
+                        </div>
+                        <div className="flex">
+                            <div 
+                            id="energy-proccent" 
+                            className="bg-white w-[100%] h-[3px] rounded-[10px] mt-2 text-center flex items-center"
+                            ></div>
                         </div>
                     </div>
                 </div>
